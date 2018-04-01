@@ -1,0 +1,194 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>JmeterDemo</groupId>
+	<artifactId>JmeterMavenJenkins</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+	<name>JmeterMavenJenkins</name>
+	<url>http://maven.apache.org</url>
+	
+	
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<jmeter.result.jtl.dir>${project.build.directory}\jmeter\results</jmeter.result.jtl.dir>
+		<jmeter.result.html.dir>${project.build.directory}\jmeter\html</jmeter.result.html.dir>
+		<jmeter.result.html.dir1>${project.build.directory}\jmeter\html1</jmeter.result.html.dir1>
+		<ReportName>TestReport</ReportName>
+	</properties>
+	
+	
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<!--<dependency>  
+                <groupId>javax.servlet</groupId>  
+                <artifactId>servlet-api</artifactId>  
+                <version>3.0-alpha-1</version>  
+            </dependency>  
+            
+            <dependency>  
+                <groupId>mysql</groupId>  
+                <artifactId>mysql-connector-java</artifactId>  
+                <version>5.1.13</version>  
+            </dependency>  -->
+	</dependencies>
+	
+<!-- <pluginRepositories>     还不知道这个是干什么用的
+        <pluginRepository>  
+            <id>Codehaus repository</id>  
+            <url>http://repository.codehaus.org/</url>  
+            <releases>  
+                <enabled>true</enabled>  
+                <updatePolicy>always</updatePolicy>  
+            </releases>  
+            <snapshots>  
+                <enabled>true</enabled>  
+                <updatePolicy>always</updatePolicy>  
+            </snapshots>  
+        </pluginRepository>  
+    </pluginRepositories>   -->
+        
+	<build>
+		<plugins>
+		
+			<plugin>
+				<groupId>com.lazerycode.jmeter</groupId>
+				<artifactId>jmeter-maven-plugin</artifactId>
+				<version>2.5.0</version>
+				<configuration>
+				
+					<!-- <resultsfileformat>xml</resultsfileformat>//设置结果文件的格式
+					<ignoreresultfailures>true</ignoreresultfailures>//忽略错误
+					<testresultstimestamp>flase</testresultstimestamp>   //去掉结果中的时间戳
+    				<appendResultsTimestamp>true</appendResultsTimestamp>//将时间戳放到文件末尾
+					<resultsFileNameDateFormat>yyyy-MM-dd-HH-mm-ss</resultsFileNameDateFormat>//时间戳格式
+					<suppressJMeterOutput>false</suppressJMeterOutput>//设置控制台输出,默认是会打印的 -->
+					
+					
+					<resultsFileFormat>xml</resultsFileFormat>
+					<ignoreResultFailures>flase</ignoreResultFailures>
+					<resultsFileNameDateFormat>yyyy-MM-dd-HH-mm-ss</resultsFileNameDateFormat>
+				</configuration>
+				<executions>
+					<execution>
+						<id>jmeter-tests</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>jmeter</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<!-- <plugin>编译源代码   
+                  <artifactid>maven-compiler-plugin</artifactid>   
+                  <configuration>   
+                      <source>1.6   
+                      <target>1.6</target>   
+                      <encoding>UTF-8</encoding>   
+                      <compilerarguments>   
+                       <extdirs>src\test\jmeter\lib</extdirs>   
+                     </compilerarguments>   
+                  </configuration>   
+                </plugin>    -->
+			
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>xml-maven-plugin</artifactId>
+				<version>1.0-beta-3</version>
+				<executions>
+					<execution>
+						<phase>verify</phase>
+						<goals>
+							<goal>transform</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<transformationSets>
+						<transformationSet>
+							<dir>${jmeter.result.jtl.dir}</dir>
+							<stylesheet>src\test\resources\jmeter-results-report_21.xsl</stylesheet>
+							<outputDir>${jmeter.result.html.dir}</outputDir>
+							<fileMappers>
+								<fileMapper
+									implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
+									<targetExtension>html</targetExtension>
+								</fileMapper>
+							</fileMappers>
+						</transformationSet>
+						<transformationSet>
+							<dir>${jmeter.result.jtl.dir}</dir>
+							<stylesheet>src\test\resources\jmeter.results.shanhe.me.xsl</stylesheet>
+							<outputDir>${jmeter.result.html.dir1}</outputDir>
+							<fileMappers>
+								<fileMapper
+									implementation="org.codehaus.plexus.components.io.filemappers.FileExtensionMapper">
+									<targetExtension>html</targetExtension>
+								</fileMapper>
+							</fileMappers>
+						</transformationSet>
+					</transformationSets>
+				</configuration>
+				<!-- using XSLT 2.0 -->
+				<dependencies>
+					<dependency>
+						<groupId>net.sf.saxon</groupId>
+						<artifactId>saxon</artifactId>
+						<version>8.7</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+			
+	 	<plugin>     
+                    <groupId>org.apache.maven.plugins</groupId>  
+                    <artifactId>maven-dependency-plugin</artifactId>  
+                    <executions>  
+                        <execution>  
+                            <id>copy-dependencies</id>  
+                            <phase>prepare-package</phase>  
+                            <goals>  
+                                <goal>copy-dependencies</goal>  
+                            </goals>  
+                            <configuration>  
+                                <outputdirectory>${project.build.directory}/jmeter/lib</outputdirectory>  
+                                <overwritereleases>false</overwritereleases>  
+                                <overwritesnapshots>false</overwritesnapshots>  
+                                <overwriteifnewer>true</overwriteifnewer>  
+                            </configuration>  
+                        </execution>  
+                    </executions>  
+                    <!-- 在IDE的环境里编译和执行代码的时候，那是直接引用一些类库。
+					但是在我们实际部署的环境里，那边很可能就一个java执行环境，不可能有源代码和IDE。
+					这个时候，我们需要将源代码编译打包。这个时候的一个问题就是如果我们引用的库很多的话，
+					我们希望能够把他们统一打包到一个目录下，比如lib文件夹。
+					这样部署执行的时候只需要将编译生成的程序jar包和依赖包文件夹拷到特定目录去执行 -->
+                </plugin> 
+               
+                
+			
+		<!-- 	<plugin>  不知道什么原因会导致首行报错
+                    <groupId>org.apache.maven.plugins</groupId>  
+                    <artifactId>maven-jar-plugin</artifactId>  
+                    <configuration>  
+                        <archive>  
+                            <manifest>  
+                                <addclasspath>true</addclasspath>  
+                                <classpathprefix>lib/</classpathprefix>  
+                                <mainclass>theMainClass</mainclass>  
+                            </manifest>  
+                        </archive>  
+                    </configuration>  
+                </plugin> -->
+                
+		</plugins>
+		<defaultGoal>clean</defaultGoal>
+	</build>
+</project>
